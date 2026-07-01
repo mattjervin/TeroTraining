@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root {
   --navy:   #001a2e;
@@ -72,7 +73,7 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   color:var(--text);margin-bottom:24px;
   opacity:0;transform:translateY(28px);transition:opacity .6s ease .25s,transform .6s ease .25s;}
 .slide.active .title-headline{opacity:1;transform:translateY(0);}
-.title-accent{color:var(--nblue);}
+.title-accent{color:var(--ngreen);}
 .title-sub{font-size:clamp(1.1rem,1.8vw,1.6rem);color:var(--muted);letter-spacing:.04em;
   margin-bottom:32px;
   opacity:0;transition:opacity .5s ease .5s;}
@@ -128,7 +129,7 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
 .slide.active .ci:nth-child(2){opacity:1;transform:translateX(0);transition-delay:.47s;}
 .slide.active .ci:nth-child(3){opacity:1;transform:translateX(0);transition-delay:.59s;}
 .slide.active .ci:nth-child(4){opacity:1;transform:translateX(0);transition-delay:.71s;}
-.ci-icon{font-size:2rem;flex-shrink:0;}
+.ci-icon{font-size:0;width:10px;height:10px;border-radius:50%;background:var(--nblue);box-shadow:0 0 8px rgba(0,200,255,.45);flex-shrink:0;margin-top:4px;}
 .ci-text{font-size:clamp(1.15rem,2vw,1.7rem);font-weight:400;color:var(--text);line-height:1.45;}
 .ci-text strong{color:var(--nblue);font-weight:600;}
 
@@ -199,13 +200,23 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
 .qr-main-lbl{font-size:clamp(1.1rem,2vw,1.6rem);font-weight:800;letter-spacing:.2em;color:var(--ngreen);text-transform:uppercase;}
 .qr-sub-lbl{font-size:clamp(.75rem,1vw,1rem);color:var(--muted);letter-spacing:.06em;text-align:center;padding:0 20px;}
 .qr-url{font-size:clamp(.75rem,1vw,.9rem);color:rgba(0,200,255,.55);text-align:center;max-width:340px;letter-spacing:.04em;}
+/* ── Reset button ─────────────────────────────── */
+.reset-btn{position:absolute;bottom:22px;right:32px;
+  background:rgba(57,232,58,.12);border:1px solid rgba(57,232,58,.38);
+  color:var(--ngreen);font-size:11px;font-weight:800;letter-spacing:.14em;
+  text-transform:uppercase;padding:8px 16px;border-radius:8px;cursor:pointer;
+  transition:all .2s;z-index:10;font-family:'Outfit',sans-serif;}
+.reset-btn:hover{background:rgba(57,232,58,.26);box-shadow:0 0 16px rgba(57,232,58,.3);}
+/* ── QR code canvas ───────────────────────────── */
+#qr-code-div{border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+#qr-code-div canvas,#qr-code-div img{display:block;border-radius:4px;}
 /* Poll results */
 .poll-res{display:flex;flex-direction:column;gap:11px;width:100%;margin-top:6px;}
 .prow{display:flex;flex-direction:column;gap:5px;}
 .plbl{font-size:clamp(.9rem,1.5vw,1.25rem);font-weight:500;color:var(--text);line-height:1.3;}
 .ptrack{display:flex;align-items:center;gap:10px;}
 .pbar-bg{flex:1;background:rgba(0,40,71,.85);border-radius:5px;height:clamp(26px,3.8vh,42px);overflow:hidden;}
-.pbar{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1);min-width:0;}
+.pollbar{height:100%;border-radius:5px;transition:width 1.2s cubic-bezier(.4,0,.2,1);min-width:0;}
 .pcount{font-size:clamp(.8rem,1.2vw,1rem);color:var(--muted);width:70px;text-align:right;flex-shrink:0;font-weight:600;}
 .poll-total-txt{font-size:clamp(.8rem,1.1vw,.95rem);color:var(--muted);margin-top:10px;letter-spacing:.06em;}
 .poll-msg{font-size:clamp(.9rem,1.3vw,1.1rem);color:var(--muted);font-style:italic;padding:18px 0;}
@@ -257,7 +268,7 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   <div class="bg-num">0</div>
   <div class="title-content">
     <div class="title-eyebrow">LCS · Collaboration Technology</div>
-    <h1 class="title-headline">Optimizing LCS<br>Documentation for<br><span class="title-accent">an AI World</span></h1>
+    <h1 class="title-headline">Optimizing LCS<br>Documentation<br>for an <span class="title-accent">AI World</span></h1>
     <p class="title-sub">A Tero Optimized Presentation</p>
     <p class="title-byline">Matt Ervin · Senior IT Manager</p>
   </div>
@@ -306,11 +317,10 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   <div class="bg-num">1</div>
   <div class="col-content">
     <div class="badge"><div class="pdot"></div>Open</div>
-    <h1 class="headline">AI Learns From<br><span class="ac-blue">What We Teach It</span></h1>
+    <h1 class="headline">AI Learns From<br><span class="ac-green">What We Teach It</span></h1>
     <div class="clist">
-      <div class="ci"><div class="ci-icon">💡</div><div class="ci-text"><strong>Your knowledge</strong> shapes AI answers</div></div>
-      <div class="ci"><div class="ci-icon">📂</div><div class="ci-text"><strong>Good docs</strong> = smarter tools</div></div>
-      <div class="ci"><div class="ci-icon">🤝</div><div class="ci-text">Together we build <strong>what's next</strong></div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text">Your knowledge = <strong>Good docs</strong></div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text">Good docs <strong>shape AI answers</strong></div></div>
     </div>
     <p class="sub" style="margin-top:16px;">Matt Ervin · Senior IT Manager, Collaboration Technology</p>
   </div>
@@ -393,11 +403,11 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   </div>
   <div class="col-content">
     <div class="badge"><div class="pdot"></div>Explore</div>
-    <h1 class="headline">The Gap We Need<br><span class="ac-blue">to Close</span></h1>
+    <h1 class="headline">The Gap We Need<br><span class="ac-green">to Close</span></h1>
     <div class="clist">
-      <div class="ci"><div class="ci-icon">🧠</div><div class="ci-text"><strong>Knowledge lives</strong> in people's heads</div></div>
-      <div class="ci"><div class="ci-icon">⚠️</div><div class="ci-text"><strong>Outdated docs</strong> → wrong AI answers</div></div>
-      <div class="ci"><div class="ci-icon">📂</div><div class="ci-text"><strong>SharePoint + LCS Connect</strong> = our foundation</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>Knowledge lives</strong> in people's heads</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>Outdated docs</strong> → wrong AI answers</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>SharePoint + LCS Connect</strong> = our foundation</div></div>
     </div>
   </div>
 </div>
@@ -409,10 +419,9 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
     <div class="badge"><div class="pdot"></div>Explain</div>
     <h1 class="headline">What We're Building<br><span class="ac-green">at LCS</span></h1>
     <div class="clist">
-      <div class="ci"><div class="ci-icon">🔍</div><div class="ci-text"><strong>RAG models</strong> on LCS Connect</div></div>
-      <div class="ci"><div class="ci-icon">⚡</div><div class="ci-text"><strong>Copilot Agents</strong> — corporate &amp; community</div></div>
-      <div class="ci"><div class="ci-icon">🙅</div><div class="ci-text">AI <strong>removes</strong> the boring work</div></div>
-      <div class="ci"><div class="ci-icon">❤️</div><div class="ci-text">Frees you to <strong>care for residents</strong></div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>RAG models</strong> on LCS Connect</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>Copilot Agents</strong> — corporate &amp; community</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text">AI removes the boring work — freeing you to <strong>care for residents</strong></div></div>
     </div>
   </div>
   <div class="col-graphic">
@@ -508,11 +517,11 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   </div>
   <div class="col-content">
     <div class="badge"><div class="pdot"></div>Invite</div>
-    <h1 class="headline">Your Knowledge Is<br><span class="ac-blue">The Missing Ingredient</span></h1>
+    <h1 class="headline">Your Knowledge Is<br><span class="ac-green">The Missing Ingredient</span></h1>
     <div class="clist">
-      <div class="ci"><div class="ci-icon">✍️</div><div class="ci-text"><strong>Document</strong> one process this week</div></div>
-      <div class="ci"><div class="ci-icon">🗂️</div><div class="ci-text">Use <strong>SharePoint + LCS Connect</strong></div></div>
-      <div class="ci"><div class="ci-icon">📍</div><div class="ci-text"><strong>DSP</strong> routes it to the right place</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>Document</strong> one process this week</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text">Store documents on <strong>SharePoint</strong></div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text">SharePoint feeds <strong>LCS Connect and AI</strong></div></div>
     </div>
   </div>
 </div>
@@ -522,7 +531,7 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   <div class="bg-num">5</div>
   <div class="col-content">
     <div class="badge poll-badge"><div class="pdot"></div>Live Poll</div>
-    <h1 class="headline">How Would You Describe<br><span class="ac-blue">Your Team's Documentation?</span></h1>
+    <h1 class="headline">How Would You Describe<br><span class="ac-green">Your Team's Documentation?</span></h1>
     <div id="poll-results"><p class="poll-msg">Waiting for votes… scan the QR code!</p></div>
     <p class="poll-total-txt" id="poll-total"></p>
   </div>
@@ -533,13 +542,12 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
         <div class="corner tr"></div>
         <div class="corner bl"></div>
         <div class="corner br"></div>
-        <div class="qr-icon">📱</div>
-        <div class="qr-main-lbl">QR Code</div>
-        <div class="qr-sub-lbl">Replace this placeholder with your hosted poll QR code image</div>
+        <div id="qr-code-div"></div>
       </div>
-      <p class="qr-url">Paste your poll URL here after hosting</p>
+      <p class="qr-url">mattjervin.github.io/TeroTraining/LCS-AI-Poll.html</p>
     </div>
   </div>
+  <button class="reset-btn" onclick="resetVotes()" title="Reset all poll votes to zero">↺ Reset Votes</button>
 </div>
 
 <!-- ══ SLIDE 6: SUMMARIZE ═══════════════════════════════════════ -->
@@ -549,9 +557,9 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
     <div class="badge"><div class="pdot"></div>Summarize</div>
     <h1 class="headline">The Loop That<br><span class="ac-green">Changes Everything</span></h1>
     <div class="clist">
-      <div class="ci"><div class="ci-icon">🔁</div><div class="ci-text"><strong>Document → AI learns → AI helps</strong></div></div>
-      <div class="ci"><div class="ci-icon">📋</div><div class="ci-text"><strong>Better docs</strong> = better resident care</div></div>
-      <div class="ci"><div class="ci-icon">🚀</div><div class="ci-text">Infrastructure ready — <strong>are we?</strong></div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>Document → AI learns → AI helps</strong></div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text"><strong>Better docs</strong> = better resident care</div></div>
+      <div class="ci"><div class="ci-icon"></div><div class="ci-text">Infrastructure ready — <strong>are we?</strong></div></div>
     </div>
   </div>
   <div class="col-graphic">
@@ -615,7 +623,7 @@ body{font-family:'Outfit',sans-serif;color:var(--text);-webkit-font-smoothing:an
   </div>
   <div class="col-content">
     <div class="badge"><div class="pdot"></div>Request Reaction</div>
-    <h1 class="headline">What's<br><span class="ac-blue">On Your Mind?</span></h1>
+    <h1 class="headline">What's<br><span class="ac-green">On Your Mind?</span></h1>
     <div class="qlist">
       <div class="qcard">"What's not documented in your department?"</div>
       <div class="qcard">"What task would you hand off to AI?"</div>
@@ -707,51 +715,84 @@ setInterval(drawBin,65);
 
 // ── Poll config ─────────────────────────────────────────────────
 // 1. Create a free account at https://jsonbin.io
-// 2. Copy your API key from the dashboard
-// 3. Click "Create Bin", paste the JSON below, save → copy the Bin ID
+// 2. Copy your API key from Account → API Keys
+// 3. Click "+ New Bin", paste this JSON, save → copy the Bin ID from the URL
 //    {"votes":[0,0,0,0],"opts":["We're on it 🚀","Some things documented 📂","Mostly in people's heads 🧠","What's documentation? 😅"]}
 const POLL_SLIDE = 5;
-const BIN_ID  = 'YOUR_BIN_ID_HERE';   // ← paste your bin ID
-const API_KEY = 'YOUR_API_KEY_HERE';  // ← paste your JSONBin API key
+const BIN_ID  = '6a447ae6da38895dfe1941f5';
+const API_KEY = '$2a$10$wmVHDrfglyU.rm8gnZFzlOrWRRh1r.U0rqp458Y7PJxrSfUeJcdam';
 const COLORS  = ['#39e83a','#00c8ff','#0081C6','#7a9bb8'];
+const POLL_OPTS = ["We're on it 🚀","Some things documented 📂","Mostly in people's heads 🧠","What's documentation? 😅"];
+const POLL_URL  = 'https://mattjervin.github.io/TeroTraining/LCS-AI-Poll.html';
 let pollTimer = null;
 
 async function fetchPoll() {
   const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,
     {headers:{'X-Access-Key':API_KEY}});
+  if(!r.ok) throw new Error('fetch failed');
   const j = await r.json();
   return j.record;
 }
 
 function renderPoll(data) {
-  const total = data.votes.reduce((a,b)=>a+b,0);
+  const votes = data.votes || [0,0,0,0];
+  const opts  = data.opts  || POLL_OPTS;
+  const total = votes.reduce((a,b)=>a+b,0);
   const el = document.getElementById('poll-results');
   if(!el) return;
   let html = '<div class="poll-res">';
-  data.opts.forEach((lbl,i)=>{
-    const pct = total>0 ? Math.round(data.votes[i]/total*100) : 0;
+  opts.forEach((lbl,i)=>{
+    const pct = total>0 ? Math.round(votes[i]/total*100) : 0;
     html += `<div class="prow">
       <div class="plbl">${lbl}</div>
       <div class="ptrack">
-        <div class="pbar-bg"><div class="pbar" style="width:${pct}%;background:${COLORS[i]}"></div></div>
-        <span class="pcount">${data.votes[i]} · ${pct}%</span>
+        <div class="pbar-bg"><div class="pollbar" style="width:${pct}%;background:${COLORS[i]}"></div></div>
+        <span class="pcount">${votes[i]} · ${pct}%</span>
       </div></div>`;
   });
   html += '</div>';
   el.innerHTML = html;
   const tot = document.getElementById('poll-total');
-  if(tot) tot.textContent = `${total} vote${total!==1?'s':''} cast`;
+  if(tot) tot.textContent = total>0 ? `${total} vote${total!==1?'s':''} cast` : '';
 }
 
 function startPolling() {
   if(BIN_ID==='YOUR_BIN_ID_HERE') return;
-  const run = ()=>fetchPoll().then(renderPoll).catch(()=>{});
+  const run = ()=>fetchPoll().then(renderPoll).catch(console.warn);
   run();
   pollTimer = setInterval(run, 4000);
 }
 function stopPolling() {
   if(pollTimer){ clearInterval(pollTimer); pollTimer=null; }
 }
+
+async function resetVotes() {
+  if(!confirm('Reset all votes to zero?')) return;
+  if(BIN_ID==='YOUR_BIN_ID_HERE'){ alert('Set BIN_ID and API_KEY first.'); return; }
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{
+      method:'PUT',
+      headers:{'X-Access-Key':API_KEY,'Content-Type':'application/json'},
+      body: JSON.stringify({votes:[0,0,0,0],opts:POLL_OPTS})
+    });
+    if(!r.ok) throw new Error('reset failed');
+    document.getElementById('poll-results').innerHTML='<p class="poll-msg">Votes reset. Waiting for votes…</p>';
+    const tot=document.getElementById('poll-total'); if(tot) tot.textContent='';
+  } catch(e){ alert('Reset failed: '+e.message); }
+}
+
+// ── QR code (auto-generated) ────────────────────────────────────
+window.addEventListener('load',()=>{
+  const el=document.getElementById('qr-code-div');
+  if(!el||typeof QRCode==='undefined') return;
+  new QRCode(el,{
+    text: POLL_URL,
+    width: 210, height: 210,
+    colorDark: '#00c8ff',
+    colorLight: '#001624',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+});
 
 // ── Slide engine ────────────────────────────────────────────────
 const TOTAL=9;
