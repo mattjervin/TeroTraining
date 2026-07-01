@@ -228,7 +228,7 @@ const API_KEY = '$2a$10$wmVHDrfglyU.rm8gnZFzlOrWRRh1r.U0rqp458Y7PJxrSfUeJcdam';
 // ─────────────────────────────────────────────────────────────
 
 const BASE    = 'https://api.jsonbin.io/v3/b';
-const HEADERS = {'X-Access-Key': API_KEY, 'Content-Type':'application/json'};
+const HEADERS = {'X-Master-Key': API_KEY, 'Content-Type':'application/json'};
 const VOTED_KEY = 'lcs_ai_poll_voted_v1';
 
 let selected = null;
@@ -261,7 +261,7 @@ document.getElementById('submit-btn').addEventListener('click', async () => {
 
   try {
     // Read current data
-    const r1 = await fetch(`${BASE}/${BIN_ID}/latest`, {headers:{'X-Access-Key':API_KEY}});
+    const r1 = await fetch(`${BASE}/${BIN_ID}/latest`, {headers:{'X-Master-Key':API_KEY}});
     if(!r1.ok) throw new Error('Read failed');
     const data = (await r1.json()).record;
 
