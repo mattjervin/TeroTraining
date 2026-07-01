@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#001a2e">
+<title>LCS Live Poll</title>
+<style>
+/* ── Setup ─────────────────────────────────── */
+/* BEFORE USING: fill in BIN_ID and API_KEY in the <script> below.
+   1. Go to https://jsonbin.io and create a free account
+   2. Get your API key from Account → API Keys
+   3. Create a new bin (+ icon) with this JSON:
+      {"votes":[0,0,0,0],"opts":["We're on it 🚀","Some things documented 📂","Mostly in people's heads 🧠","What's documentation? 😅"]}
+   4. Copy the Bin ID from the URL (e.g. 64f3a2...)
+   5. Paste both values in the script at the bottom of this file
+   6. Host this HTML file anywhere (GitHub Pages, Netlify, etc.)
+   7. Generate a QR code pointing to that URL and paste into the slide deck */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{height:100%;background:#001a2e;}
+body{
+  min-height:100dvh;
+  background:linear-gradient(160deg,#001a2e 0%,#002847 60%,#001620 100%);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  color:#e8f0f8;
+  display:flex;flex-direction:column;align-items:center;
+  padding:env(safe-area-inset-top,20px) 20px env(safe-area-inset-bottom,20px);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Header ────────────────────────────────── */
+.hdr{
+  width:100%;max-width:480px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 0 20px;
+}
+.hdr-brand{
+  font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+  color:#0081C6;
+}
+.hdr-live{
+  display:flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:#39e83a;
+}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:#39e83a;box-shadow:0 0 6px #39e83a;
+  animation:liveDot 1.5s ease-in-out infinite;
+}
+@keyframes liveDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.35;transform:scale(.6);}}
+
+/* ── Vote screen ───────────────────────────── */
+#screen-vote{width:100%;max-width:480px;display:flex;flex-direction:column;gap:20px;flex:1;}
+
+.question{
+  font-size:clamp(1.35rem,5.5vw,1.7rem);
+  font-weight:700;line-height:1.3;
+  color:#e8f0f8;
+  padding:4px 0 8px;
+}
+.question span{color:#00c8ff;}
+
+.opts{display:flex;flex-direction:column;gap:12px;}
+
+.opt-btn{
+  width:100%;
+  padding:18px 20px;
+  background:rgba(0,40,71,.7);
+  border:1.5px solid rgba(0,129,198,.28);
+  border-radius:14px;
+  color:#e8f0f8;
+  font-size:clamp(1rem,4.5vw,1.2rem);
+  font-weight:500;
+  text-align:left;
+  cursor:pointer;
+  transition:all .18s ease;
+  -webkit-tap-highlight-color:transparent;
+  line-height:1.4;
+  display:flex;align-items:center;gap:12px;
+}
+.opt-btn:active{transform:scale(.97);}
+.opt-btn.selected{
+  background:rgba(0,129,198,.22);
+  border-color:#00c8ff;
+  color:#e8f0f8;
+  box-shadow:0 0 20px rgba(0,200,255,.18);
+}
+.opt-btn.selected .opt-check{
+  background:#00c8ff;border-color:#00c8ff;
+  color:#001a2e;
+}
+.opt-check{
+  width:26px;height:26px;border-radius:50%;
+  border:1.5px solid rgba(0,129,198,.4);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:800;transition:all .18s;
+  color:transparent;
+}
+
+.submit-btn{
+  width:100%;padding:16px;
+  background:linear-gradient(135deg,#0081C6,#00c8ff);
+  border:none;border-radius:14px;
+  color:#001a2e;font-size:1.1rem;font-weight:800;
+  letter-spacing:.04em;cursor:pointer;
+  transition:all .2s;
+  box-shadow:0 4px 20px rgba(0,200,255,.3);
+  -webkit-tap-highlight-color:transparent;
+  opacity:.38;
+  pointer-events:none;
+  margin-top:4px;
+}
+.submit-btn.ready{opacity:1;pointer-events:all;}
+.submit-btn.ready:active{transform:scale(.97);}
+.submit-btn.loading{opacity:.6;pointer-events:none;}
+
+.disclaimer{
+  font-size:11px;color:rgba(122,155,184,.55);
+  text-align:center;line-height:1.6;padding-bottom:12px;
+}
+.err-msg{
+  font-size:.88rem;color:#ff6b6b;text-align:center;
+  padding:10px;display:none;
+}
+.err-msg.show{display:block;}
+
+/* ── Already voted screen ──────────────────── */
+#screen-voted{
+  width:100%;max-width:480px;
+  display:none;flex-direction:column;align-items:center;
+  gap:18px;flex:1;justify-content:center;text-align:center;
+  padding:40px 0;
+}
+.voted-icon{font-size:4rem;}
+.voted-title{font-size:1.6rem;font-weight:800;color:#00c8ff;}
+.voted-sub{font-size:1rem;color:#7a9bb8;line-height:1.6;}
+
+/* ── Thank you screen ──────────────────────── */
+#screen-thanks{
+  width:100%;max-width:480px;
+  display:none;flex-direction:column;align-items:center;
+  gap:20px;flex:1;justify-content:center;text-align:center;
+  padding:40px 0;
+}
+.thanks-ring{
+  width:90px;height:90px;border-radius:50%;
+  background:rgba(57,232,58,.12);
+  border:2px solid rgba(57,232,58,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.8rem;
+  animation:thanksPop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes thanksPop{from{transform:scale(0);}to{transform:scale(1);}}
+.thanks-title{font-size:1.8rem;font-weight:800;color:#39e83a;}
+.thanks-sub{font-size:1rem;color:#7a9bb8;line-height:1.7;max-width:320px;}
+.thanks-sub strong{color:#00c8ff;}
+
+/* ── Grid overlay ──────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(0,129,198,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(0,129,198,.05) 1px,transparent 1px);
+  background-size:36px 36px;
+}
+.hdr,.question,#screen-vote,.opts,.submit-btn,.disclaimer,
+.err-msg,#screen-thanks,#screen-voted{position:relative;z-index:1;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-brand">LCS · AI Readiness</div>
+  <div class="hdr-live"><div class="live-dot"></div>Live Poll</div>
+</div>
+
+<!-- Vote screen -->
+<div id="screen-vote">
+  <div class="question">
+    How would you describe your team's documentation <span>today?</span>
+  </div>
+  <div class="opts" id="opts">
+    <button class="opt-btn" data-i="0">
+      <span class="opt-check">✓</span>
+      We're on it — docs are solid 🚀
+    </button>
+    <button class="opt-btn" data-i="1">
+      <span class="opt-check">✓</span>
+      Some things are documented 📂
+    </button>
+    <button class="opt-btn" data-i="2">
+      <span class="opt-check">✓</span>
+      It's mostly in people's heads 🧠
+    </button>
+    <button class="opt-btn" data-i="3">
+      <span class="opt-check">✓</span>
+      What's documentation? 😅
+    </button>
+  </div>
+  <button class="submit-btn" id="submit-btn">Cast My Vote</button>
+  <div class="err-msg" id="err-msg">Something went wrong. Please try again.</div>
+  <p class="disclaimer">One vote per device · Results shown live in the room</p>
+</div>
+
+<!-- Already voted screen -->
+<div id="screen-voted">
+  <div class="voted-icon">🗳️</div>
+  <div class="voted-title">Already Voted!</div>
+  <div class="voted-sub">Your vote is already counted.<br>Watch the live results on the main screen.</div>
+</div>
+
+<!-- Thank you screen -->
+<div id="screen-thanks">
+  <div class="thanks-ring">✓</div>
+  <div class="thanks-title">Vote Cast!</div>
+  <div class="thanks-sub">
+    Your response is live.<br>
+    <strong>Look up at the screen</strong> to see the results come in.
+  </div>
+</div>
+
+<script>
+// ── CONFIG: fill these in before hosting ──────────────────────
+const BIN_ID  = 'YOUR_BIN_ID_HERE';   // JSONBin bin ID
+const API_KEY = 'YOUR_API_KEY_HERE';  // JSONBin API key
+// ─────────────────────────────────────────────────────────────
+
+const BASE    = 'https://api.jsonbin.io/v3/b';
+const HEADERS = {'X-Access-Key': API_KEY, 'Content-Type':'application/json'};
+const VOTED_KEY = 'lcs_ai_poll_voted_v1';
+
+let selected = null;
+
+// Check if already voted
+if(localStorage.getItem(VOTED_KEY)){
+  document.getElementById('screen-vote').style.display  = 'none';
+  document.getElementById('screen-voted').style.display = 'flex';
+}
+
+// Option selection
+document.getElementById('opts').addEventListener('click', e => {
+  const btn = e.target.closest('.opt-btn');
+  if(!btn) return;
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selected = parseInt(btn.dataset.i);
+  const sub = document.getElementById('submit-btn');
+  sub.classList.add('ready');
+});
+
+// Submit
+document.getElementById('submit-btn').addEventListener('click', async () => {
+  if(selected === null) return;
+  const btn = document.getElementById('submit-btn');
+  const errEl = document.getElementById('err-msg');
+  btn.classList.add('loading');
+  btn.textContent = 'Submitting…';
+  errEl.classList.remove('show');
+
+  try {
+    // Read current data
+    const r1 = await fetch(`${BASE}/${BIN_ID}/latest`, {headers:{'X-Access-Key':API_KEY}});
+    if(!r1.ok) throw new Error('Read failed');
+    const data = (await r1.json()).record;
+
+    // Increment selected vote
+    data.votes[selected]++;
+
+    // Write back
+    const r2 = await fetch(`${BASE}/${BIN_ID}`, {
+      method:'PUT',
+      headers: HEADERS,
+      body: JSON.stringify(data)
+    });
+    if(!r2.ok) throw new Error('Write failed');
+
+    // Mark voted in localStorage
+    localStorage.setItem(VOTED_KEY, '1');
+
+    // Show thank you
+    document.getElementById('screen-vote').style.display  = 'none';
+    document.getElementById('screen-thanks').style.display = 'flex';
+
+  } catch(err) {
+    btn.classList.remove('loading');
+    btn.textContent = 'Cast My Vote';
+    errEl.classList.add('show');
+    console.error(err);
+  }
+});
+</script>
+</body>
+</html>
